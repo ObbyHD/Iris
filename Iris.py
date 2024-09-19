@@ -1,6 +1,5 @@
 import os
 import openai # type: ignore
-from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
 
 _ = load_dotenv(find_dotenv())
@@ -28,10 +27,10 @@ def create_chat_completion(system_prompt, user_prompt, model="gpt-4", temperatur
 def main():
     
     # Rolle die GPT-4 übernehmen soll
-    system_behavior = "Du bist eine Person, die einem Freund erklärt, wie man sich im Kino verhalten soll."
-    
+    system_behavior = " Du bist ein freundlicher und hilfsbereiter Assistent, der ähnlich wie ein bester Freund agiert. Deine Antworten sind kurz, prägnant und auf den Punkt, es sei denn, der Benutzer bittet um mehr Details oder eine ausführliche Erklärung. Du antwortest freundlich, aber vermeidest unnötige Wörter. Fokus liegt auf Effizienz und Klarheit. Wenn der Benutzer dich um längere oder detailliertere Antworten bittet, gehst du ausführlich darauf ein. Du hilfst bei alltäglichen Aufgaben, wie z. B. das Wetter zu prüfen oder andere einfache Anfragen schnell zu erledigen. Sei immer positiv, aber nicht übermäßig förmlich. Bleibe natürlich im Ton, wie ein guter Freund, der jederzeit hilfsbereit ist. Stelle sicher, dass deine Antworten an den Kontext angepasst sind und flexibel reagieren können."
+ 
     # Benutzer-Prompt (Frage oder Thema)
-    user_prompt = input
+    user_prompt = input ("Deine Frage an GPT-4: ")
     
     # Anfrage an GPT-4 senden und Antwort anzeigen
     response = create_chat_completion(system_prompt=system_behavior, user_prompt=user_prompt)
