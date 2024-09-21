@@ -17,7 +17,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Load Vosk-Modell
-vosk_model_path = "E:/VSC/vosk-model-small-en-us-0.15" # Change Path Vosk File
+vosk_model_path = "E:/VSC/Iris/vosk-model-small-en-us-0.15" # Change Path Vosk File
 model = Model(vosk_model_path)
 recognizer = KaldiRecognizer(model, 16000)
 
