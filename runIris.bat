@@ -1,0 +1,1 @@
+wscript.exe "C:\Users\elias\Documents\GitHub\Iris\invis.vbs" "C:\Users\elias\Documents\GitHub\Iris\step.bat"

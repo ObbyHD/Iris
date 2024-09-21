@@ -12,12 +12,12 @@ from dotenv import load_dotenv
 import time
 
 load_dotenv()
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_API_KEY = "***REVOKED-KEY***"
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Load Vosk-Modell
-vosk_model_path = "E:/VSC/Iris/vosk-model-small-en-us-0.15" # Change Path Vosk File
+vosk_model_path = "./vosk-model-small-en-us-0.15" # Change Path Vosk File
 model = Model(vosk_model_path)
 recognizer = KaldiRecognizer(model, 16000)
 
@@ -83,7 +83,7 @@ def record_audio():
     frames = []
     print("Aufnahme läuft...")
 
-    silence_duration = 1 # sleep 1 sec
+    silence_duration = 2 # sleep 1 sec
     last_speech_time = time.time()
 
     try:
@@ -93,10 +93,11 @@ def record_audio():
 
             # Spracherkennung
             if recognizer.AcceptWaveform(data):
-                last_speech_time = time.time()  # reset sleep timer
+                if json.loads(recognizer.Result())['text'] != '':
+                    last_speech_time = time.time()  # reset sleep timer
 
             # Stoppe recording, wenn keine Sprache erkannt wurde
-            if time.time() - last_speech_time > silence_duration:
+            if last_speech_time < time.time()-silence_duration:
                 print("Keine Sprache erkannt. Aufnahme wird beendet.")
                 break
     except KeyboardInterrupt:
@@ -114,7 +115,7 @@ def record_audio():
     return filename
 
 while True:
-    input('Drücke die Leertaste, um den Prozess zu starten...')
+    #input('Drücke die Leertaste, um den Prozess zu starten...')
 
 
     listen_for_keyword()
@@ -152,4 +153,5 @@ while True:
         # Play MP3
         mp3_file = AudioSegment.from_mp3(output_path)
         play(mp3_file)
+        os.remove("output.wav")
         print('\n')
