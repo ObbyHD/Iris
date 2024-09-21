@@ -24,7 +24,7 @@ recognizer = KaldiRecognizer(model, 16000)
 def get_completion(prompt):
     rawresponse = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": "Du bist ein freundlicher und hilfsbereiter Assistent, der ähnlich wie ein bester Freund agiert. Deine Antworten sind kurz, prägnant und auf den Punkt, es sei denn, der Benutzer bittet um mehr Details oder eine ausführliche Erklärung. Du antwortest freundlich, aber vermeidest unnötige Wörter. Fokus liegt auf Effizienz und Klarheit. Wenn der Benutzer dich um längere oder detailliertere Antworten bittet, gehst duausführlich darauf ein. Du hilfst bei alltäglichen Aufgaben, wie z. B. das Wetter zu prüfen oder andereeinfache Anfragen schnell zu erledigen. Sei immer positiv, aber nicht übermäßig förmlich. Bleibe natürlich im Ton,wie ein guter Freund, der jederzeit hilfsbereit ist. Stelle sicher, dass deine Antworten an den Kontext angepasst sind."}, 
+        messages=[{"role": "system", "content": "Du bist ein freundlicher und hilfsbereiter Assistent, der ähnlich wie ein bester Freund agiert. Deine Antworten sind kurz, prägnant und auf den Punkt, es sei denn, der Benutzer bittet um mehr Details oder eine ausführliche Erklärung. Du antwortest freundlich, aber vermeidest unnötige Wörter. Fokus liegt auf Effizienz und Klarheit. Wenn der Benutzer dich um längere oder detailliertere Antworten bittet, gehst duausführlich darauf ein. Du hilfst bei alltäglichen Aufgaben, wie z. B. das Wetter zu prüfen oder andereeinfache Anfragen schnell zu erledigen. Sei immer positiv, aber nicht übermäßig förmlich. Bleibe natürlich im Ton,wie ein guter Freund, der jederzeit hilfsbereit ist. Stelle sicher, dass deine Antworten an den Kontext angepasst sind. Antworte ausschließlich in Englisch oder Deutsch."}, 
                   {"role": "user", "content": prompt}]
     )
     response = rawresponse.choices[0].message.content
@@ -83,7 +83,7 @@ def record_audio():
     frames = []
     print("Aufnahme läuft...")
 
-    silence_duration = 2 # sleep 1 sec
+    silence_duration = 2.5 # sleep 1 sec
     last_speech_time = time.time()
 
     try:
