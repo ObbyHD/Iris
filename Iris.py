@@ -10,6 +10,7 @@ import re
 from vosk import Model, KaldiRecognizer
 from dotenv import load_dotenv
 import time
+import threading
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -17,14 +18,14 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Load Vosk-Modell
-vosk_model_path = "E:/VSC/vosk-model-small-en-us-0.15" # Change Path Vosk File
+vosk_model_path = "E:/VSC/vosk-model-small-en-us-0.15"  # Change Path Vosk File
 model = Model(vosk_model_path)
 recognizer = KaldiRecognizer(model, 16000)
 
 def get_completion(prompt):
     rawresponse = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": "Du bist ein freundlicher und hilfsbereiter Assistent, der ähnlich wie ein bester Freund agiert. Deine Antworten sind kurz, prägnant und auf den Punkt, es sei denn, der Benutzer bittet um mehr Details oder eine ausführliche Erklärung. Du antwortest freundlich, aber vermeidest unnötige Wörter. Fokus liegt auf Effizienz und Klarheit. Wenn der Benutzer dich um längere oder detailliertere Antworten bittet, gehst duausführlich darauf ein. Du hilfst bei alltäglichen Aufgaben, wie z. B. das Wetter zu prüfen oder andereeinfache Anfragen schnell zu erledigen. Sei immer positiv, aber nicht übermäßig förmlich. Bleibe natürlich im Ton,wie ein guter Freund, der jederzeit hilfsbereit ist. Stelle sicher, dass deine Antworten an den Kontext angepasst sind."}, 
+        messages=[{"role": "system", "content": "Du bist ein freundlicher und hilfsbereiter Assistent, der ähnlich wie ein bester Freund agiert. Deine Antworten sind seehr kurz, prägnant und auf den Punkt gebracht, es sei denn, der Benutzer bittet um mehr Details oder eine ausführliche Erklärung. Du antwortest freundlich, aber vermeidest unnötige Wörter. Fokus liegt auf Effizienz und Klarheit. Wenn der Benutzer dich um längere oder detailliertere Antworten bittet, gehst du ausführlich darauf ein. Du hilfst bei alltäglichen Aufgaben, wie z. B. das Wetter zu prüfen oder andere einfache Anfragen schnell zu erledigen. Sei immer positiv, aber nicht übermäßig förmlich. Bleibe natürlich im Ton, wie ein guter Freund, der jederzeit hilfsbereit ist. Stelle sicher, dass deine Antworten an den Kontext angepasst sind. Antworte ausschließlich in Englisch oder Deutsch."}, 
                   {"role": "user", "content": prompt}]
     )
     response = rawresponse.choices[0].message.content
@@ -35,6 +36,7 @@ os.system('cls' if os.name == 'nt' else 'clear')
 
 # Boolean = False
 is_recording = False
+stop_transcription = False 
 
 def listen_for_keyword():
     global is_recording
@@ -61,7 +63,18 @@ def listen_for_keyword():
     stream.close()
     p.terminate()
 
-def record_audio():
+def save_temp_wav(frames, filename="temp_output.wav"):
+    # temporary wav file
+    p = pyaudio.PyAudio()
+    wf = wave.open(filename, 'wb')
+    wf.setnchannels(1)
+    wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+    wf.setframerate(44100)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+
+def record_audio_IRT():
+    global is_recording, stop_transcription
     filename = "output.wav"
     chunk = 1024
     FORMAT = pyaudio.paInt16
@@ -83,8 +96,32 @@ def record_audio():
     frames = []
     print("Aufnahme läuft...")
 
-    silence_duration = 1 # sleep 1 sec
+    silence_duration = 2.5  # sleep 2.5 sec
     last_speech_time = time.time()
+
+    def transcribe_IRT():
+        global is_recording, stop_transcription
+        while is_recording and not stop_transcription:
+            try:
+                save_temp_wav(frames, "temp_output.wav")
+
+                with open("temp_output.wav", "rb") as audio_file:
+                    transcribed_text = client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio_file,
+                        response_format="text"
+                    )
+                    print(f"Transkription: {transcribed_text}")
+            except Exception as e:
+                if "audio_too_short" in str(e):
+                    # Ignore Error
+                    pass
+                else:
+                    print(f"Fehler bei der Echtzeit-Transkription: {e}")
+            time.sleep(0.25)  
+
+    transcription_thread = threading.Thread(target=transcribe_IRT)
+    transcription_thread.start()
 
     try:
         while is_recording:
@@ -93,14 +130,19 @@ def record_audio():
 
             # Spracherkennung
             if recognizer.AcceptWaveform(data):
-                last_speech_time = time.time()  # reset sleep timer
+                if json.loads(recognizer.Result())['text'] != '':
+                    last_speech_time = time.time()  # reset sleep timer
 
-            # Stoppe recording, wenn keine Sprache erkannt wurde
-            if time.time() - last_speech_time > silence_duration:
+            # Stop transkription recording if no voice detected
+            if last_speech_time < time.time() - silence_duration:
                 print("Keine Sprache erkannt. Aufnahme wird beendet.")
+                stop_transcription = True 
                 break
     except KeyboardInterrupt:
         pass
+
+    is_recording = False
+    transcription_thread.join() 
 
     # Stop recording
     stream.stop_stream()
@@ -114,13 +156,10 @@ def record_audio():
     return filename
 
 while True:
-    input('Drücke die Leertaste, um den Prozess zu starten...')
-
-
     listen_for_keyword()
 
     if is_recording:
-        audio_file_path = record_audio()
+        audio_file_path = record_audio_IRT()
 
         # Transcribe audio
         with open(audio_file_path, "rb") as audio_file:
@@ -139,7 +178,7 @@ while True:
         temp_dir.mkdir(exist_ok=True)
         output_path = temp_dir / "outputiris.mp3"
         
-        # Texttospeech output
+        # TTS output
         audioresponse = client.audio.speech.create(
             model="tts-1",
             voice="alloy",
@@ -152,4 +191,6 @@ while True:
         # Play MP3
         mp3_file = AudioSegment.from_mp3(output_path)
         play(mp3_file)
+        os.remove("output.wav")
         print('\n')
+ 
