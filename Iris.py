@@ -77,14 +77,14 @@ def playSound(point):
     randint = random.randrange(1,100)
     if point == 0:
         if randint == 69:
-            infosound = AudioSegment.from_mp3(r"./sound/bing.mp3")
+            infosound = AudioSegment.from_mp3(r"./sound/Jackson.mp3")
             play(infosound)
         else:
             infosound = AudioSegment.from_mp3(r"./sound/bing.mp3")
             play(infosound)
     elif point == 1:
         if randint == 69:
-            infosound = AudioSegment.from_mp3(r"./sound/gnib.mp3")
+            infosound = AudioSegment.from_mp3(r"./sound/Noskcaj.mp3")
             play(infosound)
         else:
             infosound = AudioSegment.from_mp3(r"./sound/gnib.mp3")
@@ -213,6 +213,5 @@ while True:
         mp3_file = AudioSegment.from_mp3(output_path)
         play(mp3_file)
         os.remove("output.wav")
-        os.remove("temp_output.wav")
         print('\n')
  
