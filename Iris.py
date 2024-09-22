@@ -11,6 +11,8 @@ from vosk import Model, KaldiRecognizer
 from dotenv import load_dotenv
 import time
 import threading
+import random
+import playsound
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -18,7 +20,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Load Vosk-Modell
-vosk_model_path = "E:/VSC/vosk-model-small-en-us-0.15"  # Change Path Vosk File
+vosk_model_path = ".\vosk-model-small-en-us-0.15"  # Change Path Vosk File
 model = Model(vosk_model_path)
 recognizer = KaldiRecognizer(model, 16000)
 
@@ -95,8 +97,12 @@ def record_audio_IRT():
                     frames_per_buffer=chunk)
     frames = []
     print("Aufnahme läuft...")
+    if random(1,100) == 69:
+        playsound("/sound/bing.mp3")
+    else:
+        playsound("/sound/bing.mp3")
 
-    silence_duration = 2.5  # sleep 2.5 sec
+    silence_duration = 5 # sleep 1 sec
     last_speech_time = time.time()
 
     def transcribe_IRT():
@@ -132,11 +138,16 @@ def record_audio_IRT():
             if recognizer.AcceptWaveform(data):
                 if json.loads(recognizer.Result())['text'] != '':
                     last_speech_time = time.time()  # reset sleep timer
+                    silence_duration = 1.5 # set silence duration to lower number
 
             # Stop transkription recording if no voice detected
             if last_speech_time < time.time() - silence_duration:
                 print("Keine Sprache erkannt. Aufnahme wird beendet.")
                 stop_transcription = True 
+                if random(1,100) == 69:
+                    playsound("/sound/gnib.mp3")
+                else:
+                    playsound("/sound/gnib.mp3")
                 break
     except KeyboardInterrupt:
         pass
