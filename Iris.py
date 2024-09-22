@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 import time
 import threading
 import random
-import playsound
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -35,7 +34,6 @@ def get_completion(prompt):
     return response
 
 os.system('cls' if os.name == 'nt' else 'clear')
-
 # Boolean = False
 is_recording = False
 stop_transcription = False 
@@ -75,6 +73,23 @@ def save_temp_wav(frames, filename="temp_output.wav"):
     wf.writeframes(b''.join(frames))
     wf.close()
 
+def playSound(point):
+    randint = random.randrange(1,100)
+    if point == 0:
+        if randint == 69:
+            infosound = AudioSegment.from_mp3(r"./sound/bing.mp3")
+            play(infosound)
+        else:
+            infosound = AudioSegment.from_mp3(r"./sound/bing.mp3")
+            play(infosound)
+    elif point == 1:
+        if randint == 69:
+            infosound = AudioSegment.from_mp3(r"./sound/gnib.mp3")
+            play(infosound)
+        else:
+            infosound = AudioSegment.from_mp3(r"./sound/gnib.mp3")
+            play(infosound)
+
 def record_audio_IRT():
     global is_recording, stop_transcription
     filename = "output.wav"
@@ -97,16 +112,14 @@ def record_audio_IRT():
                     frames_per_buffer=chunk)
     frames = []
     print("Aufnahme läuft...")
-    if random(1,100) == 69:
-        playsound("/sound/bing.mp3")
-    else:
-        playsound("/sound/bing.mp3")
-
+    playSound(0)
     silence_duration = 5 # sleep 1 sec
     last_speech_time = time.time()
 
     def transcribe_IRT():
         global is_recording, stop_transcription
+        global randint
+        global playsound
         while is_recording and not stop_transcription:
             try:
                 save_temp_wav(frames, "temp_output.wav")
@@ -144,10 +157,7 @@ def record_audio_IRT():
             if last_speech_time < time.time() - silence_duration:
                 print("Keine Sprache erkannt. Aufnahme wird beendet.")
                 stop_transcription = True 
-                if random(1,100) == 69:
-                    playsound("/sound/gnib.mp3")
-                else:
-                    playsound("/sound/gnib.mp3")
+                playSound(1)
                 break
     except KeyboardInterrupt:
         pass
@@ -203,5 +213,6 @@ while True:
         mp3_file = AudioSegment.from_mp3(output_path)
         play(mp3_file)
         os.remove("output.wav")
+        os.remove("temp_output.wav")
         print('\n')
  
