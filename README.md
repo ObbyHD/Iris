@@ -1,6 +1,6 @@
 # Iris — Voice Assistant
 
-Offline-Wake-Word Voice Assistant. Hört per Vosk auf das Codewort "Iris", nimmt Sprache auf, schickt sie an OpenAI GPT-3.5 und gibt die Antwort per TTS aus. Antworten kurz und freundlich.
+Offline wake-word voice assistant. Listens for the keyword "Iris" via Vosk, records speech, sends it to OpenAI GPT-3.5 and replies via TTS. Responses are kept short and friendly.
 
 ## Stack
 Python 3.x — `openai`, `vosk`, `pyaudio`, `pydub`, `python-dotenv`
@@ -12,14 +12,14 @@ python -m venv .venv
 pip install openai vosk pyaudio pydub python-dotenv
 ```
 
-Vosk Sprachmodell separat laden: https://alphacephei.com/vosk/models — `vosk-model-small-en-us-0.15` in den Projektordner entpacken.
+Download the Vosk speech model separately: https://alphacephei.com/vosk/models — extract `vosk-model-small-en-us-0.15` into the project folder.
 
 ```bash
 python Iris.py
 ```
 
 ## Env
-Eigene `.env` mit `OPENAI_API_KEY=sk-...` (siehe `.env.example`).
+Needs your own `.env` with `OPENAI_API_KEY=sk-...` (see `.env.example`).
 
-## Hinweis
-Vosk-Modell (~40MB) ist nicht im Repo — extern laden.
+## Note
+Vosk model (~40 MB) is not in the repo — download it externally.
