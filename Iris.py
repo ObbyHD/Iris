@@ -74,16 +74,16 @@ def save_temp_wav(frames, filename="temp_output.wav"):
     wf.close()
 
 def playSound(point):
-    randint = random.randrange(1,100)
+    randint = random.randrange(1,10)
     if point == 0:
-        if randint == 69:
+        if randint == 6:
             infosound = AudioSegment.from_mp3(r"./sound/Jackson.mp3")
             play(infosound)
         else:
             infosound = AudioSegment.from_mp3(r"./sound/bing.mp3")
             play(infosound)
     elif point == 1:
-        if randint == 69:
+        if randint == 6:
             infosound = AudioSegment.from_mp3(r"./sound/Noskcaj.mp3")
             play(infosound)
         else:
